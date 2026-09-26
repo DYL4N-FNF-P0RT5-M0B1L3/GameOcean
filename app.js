@@ -1,0 +1,14 @@
+const C=window.GAMEOCEAN_CONFIG||{};const ok=C.SUPABASE_URL&&C.SUPABASE_ANON_KEY&&!C.SUPABASE_URL.includes("TU-PROYECTO");
+let sb=null;
+async function boot(){if(!ok){renderDemo();return}const {createClient}=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);loadMods()}
+async function loadMods(){const grid=document.querySelector("#modsGrid");const {data,error}=await sb.from("mods").select("*").order("created_at",{ascending:false});if(error){grid.innerHTML='<div class="empty">No se pudieron cargar los mods.</div>';return}window.mods=data||[];renderFilters();render(window.mods)}
+function renderFilters(){const f=document.querySelector("#filters");const sections=["Todos","V-slice","Psych Engine","P-slice","Codename Engine","Executables"];f.innerHTML=sections.map((x,i)=>`<button class="filter ${i===0?"active":""}" data-filter="${x}">${x}</button>`).join("");f.onclick=e=>{if(!e.target.matches(".filter"))return;document.querySelectorAll(".filter").forEach(b=>b.classList.remove("active"));e.target.classList.add("active");const x=e.target.dataset.filter;render(x==="Todos"?window.mods:window.mods.filter(m=>m.section===x))}}
+function render(list){const q=(document.querySelector("#search")?.value||"").toLowerCase();list=list.filter(m=>m.title.toLowerCase().includes(q)||m.section.toLowerCase().includes(q));const grid=document.querySelector("#modsGrid");if(!list.length){grid.innerHTML='<div class="empty">Todavía no hay mods publicados.</div>';return}grid.innerHTML=list.map(m=>`<article class="card" onclick="location.href='mod.html?id=${m.id}'"><img src="${imageUrl(m.image_path)}" alt=""><div class="card-body"><h3>${esc(m.title)}</h3><div class="muted">v${esc(m.version)}</div><span class="tag">${esc(m.section)}</span></div></article>`).join("")}
+function imageUrl(p){return sb?sb.storage.from("mod-images").getPublicUrl(p).data.publicUrl:p}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+document.querySelector("#search").addEventListener("input",()=>render(window.mods||[]));
+document.querySelector("#settingsBtn").onclick=()=>document.querySelector("#passwordModal").classList.remove("hidden");
+document.querySelector("[data-close]").onclick=()=>document.querySelector("#passwordModal").classList.add("hidden");
+document.querySelector("#passwordForm").onsubmit=e=>{e.preventDefault();if(document.querySelector("#password").value===C.ADMIN_PASSWORD){sessionStorage.setItem("gameocean_admin","1");location.href="admin.html"}else document.querySelector("#passError").textContent="Contraseña incorrecta."};
+function renderDemo(){document.querySelector("#modsGrid").innerHTML='<div class="empty">Configura config.js con tu proyecto de Supabase para activar el catálogo.</div>';renderFilters()}
+boot();
