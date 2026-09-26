@@ -4,7 +4,7 @@ Página comunitaria para mods de Friday Night Funkin', preparada para GitHub Pag
 
 ## Qué incluye
 - `index.html`: catálogo público.
-- `admin.html`: panel de publicación protegido por la contraseña `DFPM0`.
+- `admin.html`: panel de publicación protegido por la contraseña `?????`.
 - `mod.html`: página automática para cada mod.
 - Subida de imagen y archivo.
 - YouTube, versión, descripción, sección y hasta 10 creadores.
