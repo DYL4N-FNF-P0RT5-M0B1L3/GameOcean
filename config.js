@@ -1,13 +1,8 @@
-// Configuración general de la aplicación
-const CONFIG = {
-    // Si usas Supabase u otro backend, define tus llaves aquí de forma segura
-    SUPABASE_URL: "https://arikxzlrnhkmstykentk.supabase.co",
-    SUPABASE_ANON_KEY: "sb_publishable_jw1klNRlgz9zbpI7PnoRAw_t86Pc_N8",
-    
-    // Otras variables de entorno o configuración de la página
-    APP_NAME: "GameOcean",
-    VERSION: "1.0.0"
+// Configura tu proyecto de Supabase aquí.
+// Crea un proyecto en https://supabase.com y ejecuta supabase.sql.
+// IMPORTANTE: usa solamente la anon/public key en esta web. Nunca pongas una service_role key.
+window.GAMEOCEAN_CONFIG = {
+  SUPABASE_URL: "https://TU-PROYECTO.supabase.co",
+  SUPABASE_ANON_KEY: "TU_ANON_PUBLIC_KEY",
+  ADMIN_PASSWORD: "DFPM0"
 };
-
-// Exportar para que otros scripts (como app.js o admin.js) puedan usarlo sin errores en el navegador
-window.CONFIG = CONFIG;
