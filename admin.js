@@ -1,6 +1,6 @@
 const C=window.GAMEOCEAN_CONFIG||{};if(sessionStorage.getItem("gameocean_admin")!=="1")location.href="index.html";
 let sb=null;let creatorCount=0;
-async function boot(){if(C.SUPABASE_URL.includes("TU-PROYECTO")){status("Configura Supabase en config.js.");return}const {createClient}=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);addCreator()}
+async function boot(){if(C.SUPABASE_URL.includes("TU-PROYECTO")){status("Configura Supabase en config.js.");return}const {createClient}=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=createClient(C.SUPABASE_URL,C.sb_publishable_jw1klNRlgz9zbpI7PnoRAw_t86Pc_N8);addCreator()}
 function addCreator(){if(creatorCount>=10)return;creatorCount++;const box=document.querySelector("#creatorFields");const row=document.createElement("div");row.className="creator-row";row.innerHTML=`<input name="creator${creatorCount}" maxlength="60" placeholder="Etiqueta del creador #${creatorCount}"><button type="button" class="remove">×</button>`;row.querySelector(".remove").onclick=()=>{row.remove();creatorCount--};box.appendChild(row)}
 document.querySelector("#addCreator").onclick=addCreator;
 function status(x){document.querySelector("#status").textContent=x}
