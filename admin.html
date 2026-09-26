@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GameOcean — Administración</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar"><div class="brand"><span class="brand-mark">GO</span><div><b>GameOcean</b><small>Panel de publicación</small></div></div><a class="ghost" href="index.html">← Volver</a></header>
+<main class="admin-wrap">
+<section class="admin-card"><div class="eyebrow">NUEVO MOD</div><h1>Publicar proyecto</h1>
+<form id="modForm">
+<label>Título del mod<input name="title" required maxlength="100"></label>
+<label>Archivo del mod<input name="file" type="file" required></label>
+<label>Imagen principal<input name="image" type="file" accept="image/png,image/jpeg,image/webp" required></label>
+<label>Vídeo de YouTube<input name="youtube" type="url" placeholder="https://www.youtube.com/watch?v=..."></label>
+<label>Versión<input name="version" required maxlength="30" placeholder="1.0.0"></label>
+<label>Descripción<textarea name="description" required maxlength="5000"></textarea></label>
+<label>Sección<select name="section" required>
+<option value="V-slice">V-slice</option><option value="Psych Engine">Psych Engine</option><option value="P-slice">P-slice</option><option value="Codename Engine">Codename Engine</option><option value="Executables">Executables</option>
+</select></label>
+<div class="creators"><h3>Creadores (máximo 10)</h3><div id="creatorFields"></div><button type="button" class="secondary" id="addCreator">+ Añadir creador</button></div>
+<button class="primary" type="submit" id="publishBtn">Guardar y publicar</button><p id="status"></p>
+</form></section>
+</main>
+<script src="config.js"></script><script src="admin.js"></script>
+</body></html>
