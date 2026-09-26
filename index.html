@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GameOcean — FNF Mods</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">GO</span><div><b>GameOcean</b><small>Friday Night Funkin' Mods</small></div></div>
+  <nav><a href="#mods">Mods</a><a href="#about">Acerca</a></nav>
+</header>
+<main>
+  <section class="hero">
+    <p class="eyebrow">FRIDAY NIGHT FUNKIN'</p>
+    <h1>Descubre mods de la comunidad.</h1>
+    <p>Explora proyectos, mira sus vídeos y descarga sus archivos.</p>
+  </section>
+  <section id="mods" class="content">
+    <div class="section-head"><div><span class="eyebrow">CATÁLOGO</span><h2>Mods publicados</h2></div><input id="search" class="search" placeholder="Buscar mod..."></div>
+    <div id="filters" class="filters"></div>
+    <div id="modsGrid" class="grid"><div class="loading">Cargando mods...</div></div>
+  </section>
+  <section id="about" class="about"><h2>GameOcean</h2><p>Un catálogo comunitario para compartir proyectos de Friday Night Funkin'.</p></section>
+</main>
+<button class="settings" id="settingsBtn" aria-label="Panel de administración">⚙</button>
+<div class="modal hidden" id="passwordModal">
+  <div class="modal-card"><button class="close" data-close>×</button><h2>Acceso</h2><p>Introduce la contraseña de administración.</p>
+  <form id="passwordForm"><input id="password" type="password" autocomplete="off" placeholder="Contraseña"><button>Entrar</button></form><p id="passError" class="error"></p></div>
+</div>
+<script src="config.js"></script><script src="app.js"></script>
+</body></html>
