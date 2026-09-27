@@ -1,3 +1,23 @@
+# Archivo de configuración con datos sensibles y contraseña de admin
+config.js
+
+# Archivos temporales y basura del sistema operativo
 .DS_Store
-.env
+Thumbs.db
+desktop.ini
+
+# Carpetas de configuración de editores de código (VS Code, WebStorm, etc.)
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos de respaldo, logs y respaldos antiguos de Supabase
+*.log
+*.tmp
+*.bak
+supabase.sql
+
+# Dependencias (por si en el futuro usas paquetes o Node.js)
 node_modules/
+
