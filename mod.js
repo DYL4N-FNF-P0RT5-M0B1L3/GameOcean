@@ -1,9 +1,27 @@
-const C=window.GAMEOCEAN_CONFIG||{};let sb=null,modId=new URLSearchParams(location.search).get("id");
-async function boot(){if(!modId)return show("Falta el ID del mod.");if(C.https://arikxzlrnhkmstykentk.supabase.co.includes("DFPM' Projects"))return show("Configura Supabase en config.js.");const {createClient}=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");sb=createClient(C.https://arikxzlrnhkmstykentk.supabase.co,C.sb_publishable_jw1klNRlgz9zbpI7PnoRAw_t86Pc_N8);const {data,error}=await sb.from("mods").select("*").eq("id",modId).single();if(error)return show("No se encontró el mod.");window.mod=data;render();loadComments()}
-function show(x){document.querySelector("#detail").innerHTML=`<div class="empty">${x}</div>`}
-function yt(u){try{const x=new URL(u);let id=x.searchParams.get("v");if(x.hostname==="youtu.be")id=x.pathname.slice(1);if(x.pathname.startsWith("/shorts/"))id=x.pathname.split("/")[2];return id?`<div class="video"><iframe src="https://www.youtube.com/embed/${encodeURIComponent(id)}" allowfullscreen></iframe></div>`:""}catch{return""}}
-function render(){const m=window.mod;const creators=(m.creators||[]).map(c=>`<span class="tag">${esc(c.label)}</span>`).join(" ");const file=sb.storage.from("mod-files").getPublicUrl(m.file_path).data.publicUrl;const img=sb.storage.from("mod-images").getPublicUrl(m.image_path).data.publicUrl;document.querySelector("#detail").innerHTML=`<img class="hero-img" src="${img}"><div class="eyebrow" style="margin-top:25px">${esc(m.section)}</div><h1>${esc(m.title)}</h1><div class="muted">Versión ${esc(m.version)} · ${new Date(m.created_at).toLocaleDateString()}</div><div>${creators}</div>${yt(m.youtube)}<p class="description">${esc(m.description)}</p><a class="download" href="${file}" target="_blank" rel="noopener">Descargar archivo</a><section class="comments"><h2>Comentarios y calificaciones</h2><form class="comment-form" id="commentForm"><input name="author" required maxlength="60" placeholder="Tu nombre"><select name="rating" required><option value="">Calificación</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><textarea name="body" required maxlength="1000" placeholder="Escribe un comentario"></textarea><button class="primary">Publicar</button></form><div id="commentsList"></div></section>`;document.querySelector("#commentForm").onsubmit=addComment}
-async function loadComments(){const {data}=await sb.from("comments").select("*").eq("mod_id",modId).order("created_at",{ascending:false});const box=document.querySelector("#commentsList");if(!data?.length){box.innerHTML='<div class="muted">Sé el primero en comentar.</div>';return}box.innerHTML=data.map(c=>`<div class="comment"><b>${esc(c.author)}</b> <span class="rating">★ ${c.rating||"—"}</span><br><small>${new Date(c.created_at).toLocaleString()}</small><p>${esc(c.body)}</p></div>`).join("")}
-async function addComment(e){e.preventDefault();const f=new FormData(e.target);const r=await sb.from("comments").insert({mod_id:modId,author:f.get("author").trim(),body:f.get("body").trim(),rating:Number(f.get("rating"))});if(r.error){alert(r.error.message);return}e.target.reset();loadComments()}
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-boot();
+const DB_KEY = "gameocean_mods";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const modId = urlParams.get("id");
+
+  if (!modId) {
+    location.href = "index.html";
+    return;
+  }
+
+  const mods = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+  const mod = mods.find(m => m.id === modId);
+
+  if (!mod) {
+    document.body.innerHTML = "<h2 style='text-align:center;padding:50px;'>Mod no encontrado. <a href='index.html'>Volver</a></h2>";
+    return;
+  }
+
+  // Rellenar datos en la pantalla
+  if (document.querySelector("#modTitle")) document.querySelector("#modTitle").textContent = mod.title;
+  if (document.querySelector("#modVersion")) document.querySelector("#modVersion").textContent = "v" + mod.version;
+  if (document.querySelector("#modSection")) document.querySelector("#modSection").textContent = mod.section;
+  if (document.querySelector("#modImage")) document.querySelector("#modImage").src = mod.image_path;
+  if (document.querySelector("#modDesc")) document.querySelector("#modDesc").textContent = mod.description;
+  if (document.querySelector("#modDownload")) document.querySelector("#modDownload").href = mod.downloadUrl || "#";
+});
