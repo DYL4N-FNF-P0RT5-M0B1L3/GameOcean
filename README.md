@@ -1,37 +1,30 @@
-# GameOcean
+# 🌊 GameOcean — Catálogo de Mods de Friday Night Funkin'
 
-Página comunitaria para mods de Friday Night Funkin', preparada para GitHub Pages + Supabase.
+**GameOcean** es un portal web comunitario y responsivo diseñado para explorar, filtrar y publicar mods de *Friday Night Funkin'* de forma rápida y sencilla.
 
-## Qué incluye
-- `index.html`: catálogo público.
-- `admin.html`: panel de publicación protegido por la contraseña `#####`.
-- `mod.html`: página automática para cada mod.
-- Subida de imagen y archivo.
-- YouTube, versión, descripción, sección y hasta 10 creadores.
-- Comentarios y calificaciones de 1 a 5.
-- `supabase.sql`: tablas, RLS y Storage.
-- Diseño blanco/negro/neón y responsive.
+Actualmente funciona de manera **100% local** mediante la memoria del navegador (`localStorage`), convirtiendo las imágenes subidas a formato Base64 para una previsualización inmediata sin depender de servidores o bases de datos externas.
 
-## Configuración
-1. Crea un proyecto en Supabase.
-2. Abre SQL Editor y ejecuta `supabase.sql`.
-3. Copia Project URL y la anon/public key.
-4. Edita `config.js`:
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-5. Publica la carpeta en GitHub Pages.
+---
 
-## Importante sobre GitHub Pages
-GitHub Pages solamente sirve archivos estáticos; no puede ejecutar por sí solo un servidor Node/PHP ni guardar una base de datos. Por eso esta versión usa Supabase como backend/Storage.
+## 🚀 Características Principales
 
-La contraseña `?????` está en JavaScript porque el panel es estático. Esto NO es una protección real: alguien con conocimientos puede verla. Para una instalación pública real, usa Supabase Auth o una Edge Function que compruebe permisos en servidor.
+* 🔍 **Buscador en tiempo real:** Filtra mods por título o categoría al instante.
+* 🏷️ **Filtros por Motor:** Organización por categorías (*Psych Engine, V-slice, P-slice, Codename Engine, Executables*).
+* ⚙️ **Panel de Administración:** Acceso protegido mediante contraseña para la publicación de contenido.
+* 🖼️ **Soporte Multimedia:** Carga de imágenes en tiempo real, incrustación de vídeos y enlaces de descarga.
+* 📱 **Diseño Adaptativo (Responsive):** Optimizado tanto para computadoras de escritorio como para dispositivos móviles.
 
-## GitHub Pages
-Sube todos los archivos del proyecto al repositorio y activa Settings > Pages > Deploy from branch. La URL resultante puede usarse como página principal.
+---
 
-## Seguridad recomendada antes de hacerlo público
-- Sustituir la contraseña del cliente por Supabase Auth.
-- Limitar tamaño/tipo de archivos en Storage.
-- Añadir moderación/rate limiting para comentarios.
-- Añadir CAPTCHA o login para evitar spam.
-- No usar nunca `service_role` en `config.js`.
+## 📁 Estructura del Proyecto
+
+```text
+GameOcean/
+├── index.html       # Página principal (Catálogo de mods)
+├── admin.html       # Panel de administración (Subida de mods)
+├── mod.html         # Vista detallada de un mod individual
+├── styles.css       # Estilos globales y diseño responsive
+├── config.js        # Configuración de credenciales de administración
+├── app.js           # Lógica del catálogo principal, filtros y buscador
+├── admin.js         # Lógica de subida y procesamiento en localStorage
+└── mod.js           # Lógica para mostrar la información del mod seleccionado
