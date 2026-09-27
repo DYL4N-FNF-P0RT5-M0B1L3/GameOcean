@@ -82,7 +82,7 @@ if (closeBtn) {
 document.querySelector("#passwordForm")?.addEventListener("submit", e => {
   e.preventDefault();
   const pass = document.querySelector("#password")?.value;
-  const configPass = window.GAMEOCEAN_CONFIG?.ADMIN_PASSWORD || "admin";
+  const configPass = window.GAMEOCEAN_CONFIG?.ADMIN_PASSWORD || "DFPM0";
   
   if (pass === configPass) {
     sessionStorage.setItem("gameocean_admin", "1");
