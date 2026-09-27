@@ -1,75 +1,73 @@
-const C = window.GAMEOCEAN_CONFIG || {};
+// Nombre del almacén en localStorage
+const DB_KEY = "gameocean_mods";
 
-// 1. CORRECCIÓN DEL ERROR DE SINTAXIS
-// Se asignan las credenciales correctamente sin romper la lectura de variables
-const urlSupabase = C.SUPABASE_URL || "https://arikxzlrnhkmstykentk.supabase.co";
-const keySupabase = C.SUPABASE_KEY || "jw1klNRlgz9zbpI7PnoRAw_t86Pc_N8"; 
-const ok = urlSupabase && keySupabase && !urlSupabase.includes("DFPM' Projects");
-
-let sb = null;
-
-async function boot() {
-  if (!ok) { renderDemo(); return; }
-  try {
-    const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
-    sb = createClient(urlSupabase, keySupabase);
-    loadMods();
-  } catch (err) {
-    console.error("Error al cargar Supabase:", err);
-  }
+function getLocalMods() {
+  const data = localStorage.getItem(DB_KEY);
+  return data ? JSON.parse(data) : [];
 }
 
-async function loadMods() {
-  const grid = document.querySelector("#modsGrid");
-  const { data, error } = await sb.from("mods").select("*").order("created_at", { ascending: false });
-  
-  if (error) {
-    grid.innerHTML = '<div class="empty">No se pudieron cargar los mods.</div>';
-    return;
-  }
-  window.mods = data || [];
+function loadMods() {
+  window.mods = getLocalMods();
   renderFilters();
   render(window.mods);
 }
 
 function renderFilters() {
   const f = document.querySelector("#filters");
+  if (!f) return;
   const sections = ["Todos", "V-slice", "Psych Engine", "P-slice", "Codename Engine", "Executables"];
-  f.innerHTML = sections.map((x, i) => `<button class="filter ${i === 0 ? "active" : ""}" data-filter="${x}">${x}</button>`).join("");
+  
+  f.innerHTML = sections.map((x, i) => 
+    `<button class="filter ${i === 0 ? "active" : ""}" data-filter="${x}">${x}</button>`
+  ).join("");
+
   f.onclick = e => {
     if (!e.target.matches(".filter")) return;
     document.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
     const x = e.target.dataset.filter;
     render(x === "Todos" ? window.mods : window.mods.filter(m => m.section === x));
-  }
+  };
 }
 
 function render(list) {
   const q = (document.querySelector("#search")?.value || "").toLowerCase();
   list = list.filter(m => m.title.toLowerCase().includes(q) || m.section.toLowerCase().includes(q));
   const grid = document.querySelector("#modsGrid");
-  
+  if (!grid) return;
+
   if (!list.length) {
-    grid.innerHTML = '<div class="empty">Todavía no hay mods publicados.</div>';
+    grid.innerHTML = '<div class="empty">Aún no hay mods subidos. ¡Usa el engranaje para agregar el primero!</div>';
     return;
   }
-  
-  grid.innerHTML = list.map(m => `<article class="card" onclick="location.href='mod.html?id=${m.id}'"><img src="${imageUrl(m.image_path)}" alt=""><div class="card-body"><h3>${esc(m.title)}</h3><div class="muted">v${esc(m.version)}</div><span class="tag">${esc(m.section)}</span></div></article>`).join("");
+
+  grid.innerHTML = list.map(m => `
+    <article class="card" onclick="location.href='mod.html?id=${m.id}'">
+      <img src="${m.image_path}" alt="${esc(m.title)}">
+      <div class="card-body">
+        <h3>${esc(m.title)}</h3>
+        <div class="muted">v${esc(m.version)}</div>
+        <span class="tag">${esc(m.section)}</span>
+      </div>
+    </article>
+  `).join("");
 }
 
-function imageUrl(p) { return sb ? sb.storage.from("mod-images").getPublicUrl(p).data.publicUrl : p }
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
 
-function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])) }
+// Buscador
+document.querySelector("#search")?.addEventListener("input", () => render(window.mods || []));
 
-document.querySelector("#search").addEventListener("input", () => render(window.mods || []));
-
-// 2. ACTIVACIÓN SEGURA DEL ENGRANAJE EN PC Y MÓVIL
+// Botón de engranaje y modal de contraseña
 const settingsBtn = document.querySelector("#settingsBtn");
 if (settingsBtn) {
   settingsBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    document.querySelector("#passwordModal").classList.remove("hidden");
+    document.querySelector("#passwordModal")?.classList.remove("hidden");
   });
 }
 
@@ -77,24 +75,23 @@ const closeBtn = document.querySelector("[data-close]");
 if (closeBtn) {
   closeBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    document.querySelector("#passwordModal").classList.add("hidden");
+    document.querySelector("#passwordModal")?.classList.add("hidden");
   });
 }
 
-document.querySelector("#passwordForm").onsubmit = e => {
+document.querySelector("#passwordForm")?.addEventListener("submit", e => {
   e.preventDefault();
-  if (document.querySelector("#password").value === C.ADMIN_PASSWORD) {
+  const pass = document.querySelector("#password")?.value;
+  const configPass = window.GAMEOCEAN_CONFIG?.ADMIN_PASSWORD || "admin";
+  
+  if (pass === configPass) {
     sessionStorage.setItem("gameocean_admin", "1");
     location.href = "admin.html";
   } else {
     document.querySelector("#passError").textContent = "Contraseña incorrecta.";
   }
-};
+});
 
-function renderDemo() {
-  document.querySelector("#modsGrid").innerHTML = '<div class="empty">Configura config.js con tu proyecto de Supabase para activar el catálogo.</div>';
-  renderFilters();
-}
-
-boot();
-                                
+// Cargar al iniciar
+document.addEventListener("DOMContentLoaded", loadMods);
+      
