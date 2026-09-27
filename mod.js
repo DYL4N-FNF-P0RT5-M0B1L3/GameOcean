@@ -1,103 +1,76 @@
 const DB_KEY = "gameocean_mods";
-const MAX_CREATORS = 10;
 
 document.addEventListener("DOMContentLoaded", () => {
-  const creatorFields = document.querySelector("#creatorFields");
-  const addCreatorBtn = document.querySelector("#addCreator");
-  const form = document.querySelector("#modForm");
-  const statusMsg = document.querySelector("#status");
+  const detailContainer = document.querySelector("#detail");
+  if (!detailContainer) return;
 
-  // Añadir campos dinámicos de creadores
-  if (addCreatorBtn && creatorFields) {
-    addCreatorBtn.addEventListener("click", () => {
-      const inputs = creatorFields.querySelectorAll("input");
-      if (inputs.length >= MAX_CREATORS) {
-        alert("Máximo 10 creadores permitidos.");
-        return;
-      }
+  // Obtener el ID del mod desde la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const modId = urlParams.get("id");
 
-      const row = document.createElement("div");
-      row.className = "creator-row";
-      row.style.display = "flex";
-      row.style.gap = "8px";
-      row.style.marginTop = "8px";
-
-      row.innerHTML = `
-        <input type="text" name="creators[]" placeholder="Nombre del creador" maxlength="50" style="flex:1;">
-        <button type="button" class="ghost remove-creator" style="padding:4px 12px; cursor:pointer;">✕</button>
-      `;
-
-      row.querySelector(".remove-creator").addEventListener("click", () => row.remove());
-      creatorFields.appendChild(row);
-    });
+  if (!modId) {
+    window.location.href = "index.html";
+    return;
   }
 
-  // Guardar datos al enviar el formulario
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  // Cargar mods desde localStorage
+  const mods = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+  const mod = mods.find(m => m.id === modId);
+
+  if (!mod) {
+    detailContainer.innerHTML = `
+      <div style="text-align: center; padding: 40px 20px;">
+        <h2>Mod no encontrado ❌</h2>
+        <p class="muted">El proyecto solicitado no existe o fue eliminado.</p>
+        <a href="index.html" class="ghost" style="margin-top: 15px; display: inline-block;">← Volver al catálogo</a>
+      </div>
+    `;
+    return;
+  }
+
+  // Renderizar la información del mod
+  const creadoresTexto = mod.creators && mod.creators.length > 0 
+    ? mod.creators.join(", ") 
+    : "Comunidad";
+
+  detailContainer.innerHTML = `
+    <article class="detail-card">
+      <img src="${mod.image_path}" alt="${esc(mod.title)}" class="hero-img" style="width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px;">
       
-      if (statusMsg) statusMsg.textContent = "Procesando...";
+      <div class="detail-body" style="margin-top: 20px;">
+        <h1>${esc(mod.title)}</h1>
+        
+        <div style="margin: 10px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <span class="tag" style="background: #333; padding: 4px 8px; border-radius: 4px;">${esc(mod.section)}</span>
+          <span class="muted">Versión: ${esc(mod.version)}</span>
+        </div>
 
-      const formData = new FormData(form);
-      const title = formData.get("title");
-      const version = formData.get("version");
-      const description = formData.get("description");
-      const section = formData.get("section");
-      const youtube = formData.get("youtube");
-      const imageFile = formData.get("image");
-      const modFile = formData.get("file");
+        <p class="muted" style="font-size: 14px; margin-bottom: 20px;">
+          <b>Creado por:</b> ${esc(creadoresTexto)}
+        </p>
 
-      // Recopilar lista de creadores
-      const creatorInputs = form.querySelectorAll("input[name='creators[]']");
-      const creators = Array.from(creatorInputs)
-        .map(input => input.value.trim())
-        .filter(val => val !== "");
+        <p class="description" style="white-space: pre-line; line-height: 1.6;">${esc(mod.description || "Sin descripción disponible.")}</p>
 
-      try {
-        // Convertir imagen a Base64
-        let imageBase64 = "https://via.placeholder.com/400x225?text=Sin+Imagen";
-        if (imageFile && imageFile.size > 0) {
-          imageBase64 = await readFileAsBase64(imageFile);
-        }
+        <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 12px;">
+          ${mod.videoUrl ? `
+            <a href="${esc(mod.videoUrl)}" target="_blank" rel="noopener noreferrer" class="ghost" style="text-align: center; padding: 12px; border: 1px solid #444; border-radius: 6px; text-decoration: none;">
+              📺 Ver Trailer / Vídeo en YouTube
+            </a>
+          ` : ""}
 
-        const nuevoMod = {
-          id: Date.now().toString(),
-          title,
-          version,
-          description,
-          section,
-          videoUrl: youtube || "",
-          fileName: modFile ? modFile.name : "",
-          image_path: imageBase64,
-          creators,
-          created_at: new Date().toISOString()
-        };
-
-        // Guardar en localStorage
-        const mods = JSON.parse(localStorage.getItem(DB_KEY)) || [];
-        mods.unshift(nuevoMod);
-        localStorage.setItem(DB_KEY, JSON.stringify(mods));
-
-        if (statusMsg) statusMsg.textContent = "¡Mod publicado con éxito! 🎉";
-        alert("¡Mod publicado con éxito! 🎉");
-        window.location.href = "index.html";
-
-      } catch (err) {
-        console.error(err);
-        if (statusMsg) statusMsg.textContent = "Error: La imagen es demasiado pesada para el almacenamiento local.";
-        alert("Error: Intenta elegir una imagen de menor peso (menos de 2 MB).");
-      }
-    });
-  }
+          ${mod.downloadUrl ? `
+            <a href="${esc(mod.downloadUrl)}" target="_blank" rel="noopener noreferrer" class="primary" style="text-align: center; padding: 14px; background: #0070f3; color: white; border-radius: 6px; text-decoration: none; font-weight: bold;">
+              ⬇️ Descargar Mod
+            </a>
+          ` : ""}
+        </div>
+      </div>
+    </article>
+  `;
 });
 
-// Función auxiliar para leer archivos de imagen a Base64
-function readFileAsBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-    reader.readAsDataURL(file);
-  });
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
 }
