@@ -9,8 +9,8 @@ create table if not exists public.mods (
   version text not null,
   section text not null check (section in ('V-slice','Psych Engine','P-slice','Codename Engine','Executables')),
   youtube text,
-  image_path text not null,
-  file_path text not null,
+  image_path text, -- Ahora es opcional (permite nulos)
+  file_path text,  -- Ahora es opcional (permite nulos)
   creators jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now()
 );
@@ -58,7 +58,3 @@ create policy "public file read" on storage.objects for select using (bucket_id=
 drop policy if exists "public file upload" on storage.objects;
 create policy "public file upload" on storage.objects for insert with check (bucket_id='mod-files');
 
--- IMPORTANT:
--- This starter intentionally keeps the admin gate client-side because GitHub Pages is static.
--- For a public production site, replace it with Supabase Auth/Edge Functions so the admin
--- password is not exposed in browser code.
